@@ -13,12 +13,14 @@ ap.add_argument("-i", "--image", required=True,
 	help="path to input image to be OCR'd")
 ap.add_argument("-u", "--username", required=True,
 	help="username to search in OCR output")
+ap.add_argument("-p", "--plot", type=str, default="false",
+	help="true, to display plot, false else")
 args = vars(ap.parse_args())
 
 username = args["username"]
 # load the example image and convert it to grayscale
 image = cv2.imread(args["image"])
-template =  cv2.imread("/home/linda/Dropbox/Photos/template_lvl.PNG")
+template =  cv2.imread("template_ios.PNG")
 gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 orig_gray = gray
 gray_template = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
@@ -58,17 +60,18 @@ else:
 
 
 # plott images
-fig = plt.figure(figsize=(8, 3))
-ax1 = plt.subplot(1, 3, 1)
-ax2 = plt.subplot(1, 3, 2)
-ax3 = plt.subplot(1, 3, 3, sharex=ax2, sharey=ax2)
-ax1.imshow(orig_gray)
-ax2.imshow(levelarea)
-ax3.imshow(result)
-ax3.set_axis_off()
-ax3.set_title('`match_template`\nresult')
-# highlight matched region
-ax3.autoscale(False)
-ax3.plot(x, y, 'o', markeredgecolor='r', markerfacecolor='none', markersize=10)
+if (args["plot"] == "true"):
+	fig = plt.figure(figsize=(8, 3))
+	ax1 = plt.subplot(1, 3, 1)
+	ax2 = plt.subplot(1, 3, 2)
+	ax3 = plt.subplot(1, 3, 3, sharex=ax2, sharey=ax2)
+	ax1.imshow(orig_gray)
+	ax2.imshow(levelarea)
+	ax3.imshow(result)
+	ax3.set_axis_off()
+	ax3.set_title('`match_template`\nresult')
+	# highlight matched region
+	ax3.autoscale(False)
+	ax3.plot(x, y, 'o', markeredgecolor='r', markerfacecolor='none', markersize=10)
 
-plt.show()
+	plt.show()
