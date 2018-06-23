@@ -11,8 +11,11 @@ import matplotlib.pyplot as plt
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
 	help="path to input image to be OCR'd")
+ap.add_argument("-u", "--username", required=True,
+	help="username to search in OCR output")
 args = vars(ap.parse_args())
 
+username = args["username"]
 # load the example image and convert it to grayscale
 image = cv2.imread(args["image"])
 template =  cv2.imread("/home/linda/Dropbox/Photos/template_lvl.PNG")
@@ -20,10 +23,18 @@ gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 orig_gray = gray
 gray_template = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
 
-
+# find location of level
 result = match_template(gray, gray_template)
 ij = np.unravel_index(np.argmax(result), result.shape)
 x, y = ij[::-1]
+
+# extract level from image
+height, width  = gray.shape
+# print("width: " + str(width) +"  "+ str(int(0.1*width)))
+levelarea = gray[y-int(0.1*width):y+int(0.05*width),x-int(0.03*width):x+int(0.12*width)]
+level = pytesseract.image_to_string(levelarea)
+print("Found Level:")
+print([int(s) for s in level.split() if s.isdigit()][0])
 
 # check to see if we should apply thresholding to preprocess the
 # image
@@ -39,15 +50,20 @@ cv2.imwrite(filename, gray)
 # the temporary file
 text = pytesseract.image_to_string(Image.open(filename))
 os.remove(filename)
-print(text)
+# print(text)
+if (text.find(username) >= 0):
+	print("Username found: " + username)
+else:
+	print("Username not found")
+
 
 # plott images
 fig = plt.figure(figsize=(8, 3))
 ax1 = plt.subplot(1, 3, 1)
 ax2 = plt.subplot(1, 3, 2)
 ax3 = plt.subplot(1, 3, 3, sharex=ax2, sharey=ax2)
-ax1.imshow(image)
-ax2.imshow(orig_gray)
+ax1.imshow(orig_gray)
+ax2.imshow(levelarea)
 ax3.imshow(result)
 ax3.set_axis_off()
 ax3.set_title('`match_template`\nresult')
