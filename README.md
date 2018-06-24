@@ -1,3 +1,9 @@
+Pokemon GO Profile Parsing
+==========================
+Python script to parse Player Level out of Profile Screenshot and verify the Username in the Screenshot with a given Username.
+
+Usage
+-----
 ```
 usage: ocr.py [-h] -i IMAGE -u USERNAME [-p PLOT]
 
