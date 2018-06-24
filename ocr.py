@@ -36,7 +36,11 @@ height, width  = gray.shape
 levelarea = gray[y-int(0.1*width):y+int(0.05*width),x-int(0.03*width):x+int(0.12*width)]
 level = pytesseract.image_to_string(levelarea)
 print("Found Level:")
-print([int(s) for s in level.split() if s.isdigit()][0])
+reqLevel = [int(s) for s in level.split() if s.isdigit()]
+if reqLevel == []:
+	print("no Level found")
+else:
+	print(reqLevel[0])
 
 # check to see if we should apply thresholding to preprocess the
 # image
@@ -53,7 +57,8 @@ cv2.imwrite(filename, gray)
 text = pytesseract.image_to_string(Image.open(filename))
 os.remove(filename)
 # print(text)
-if (text.find(username) >= 0):
+clearText = ''.join(e for e in text if e.isalnum())
+if (clearText.find(username) >= 0):
 	print("Username found: " + username)
 else:
 	print("Username not found")
