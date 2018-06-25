@@ -1,11 +1,9 @@
 # import the necessary packages
 from PIL import Image
 import pytesseract
-import argparse
 import cv2
 import numpy as np
 from skimage.feature import match_template
-import matplotlib.pyplot as plt
 from fuzzywuzzy import fuzz
 
 orig_gray = None
@@ -72,6 +70,9 @@ def getLevel(imagepath, username):
 
 # main if module used standalone
 if __name__ == '__main__':
+	import argparse
+	import matplotlib.pyplot as plt
+
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", required=True,
 		help="path to input image to be OCR'd")
