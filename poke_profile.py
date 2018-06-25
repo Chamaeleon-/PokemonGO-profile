@@ -13,36 +13,46 @@ resultImage = None
 x = None
 y = None
 levelarea = None
-
-def getLevel(imagepath, username):
-	result = [0,False]
-	# load the example image and convert it to grayscale
-	image = cv2.imread(imagepath)
-	template =  cv2.imread("template_ios.PNG")
-	if image is None:
-		print("Error while reading file")
-		return None
-	gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-	global orig_gray
-	orig_gray = gray
-	gray_template = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
-
+def _parseLevel(gray, template):
 	# find location of level
 	global resultImage
-	resultImage = match_template(gray, gray_template)
+	resultImage = match_template(gray, template)
 	ij = np.unravel_index(np.argmax(resultImage), resultImage.shape)
 	global x
 	global y
 	x, y = ij[::-1]
-
 	# extract level from image
 	height, width  = gray.shape
 	global levelarea
 	levelarea = gray[y-int(0.1*width):y+int(0.05*width),x-int(0.03*width):x+int(0.12*width)]
 	level = pytesseract.image_to_string(levelarea)
 	reqLevel = [int(s) for s in level.split() if s.isdigit()]
+	return reqLevel
+
+def getLevel(imagepath, username):
+	result = [0,False]
+	# load the example image and convert it to grayscale
+	image = cv2.imread(imagepath)
+	template_ios =  cv2.imread("template_ios.PNG")
+	template_android = cv2.imread("template_android.PNG")
+	if image is None:
+		print("Error while reading file")
+		return None
+	gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+	global orig_gray
+	orig_gray = gray
+	gray_template_ios = cv2.cvtColor(template_ios, cv2.COLOR_RGB2GRAY)
+	gray_template_android = cv2.cvtColor(template_android, cv2.COLOR_RGB2GRAY)
+
+	# test for android template
+	reqLevel = _parseLevel(gray, gray_template_android)
 	if reqLevel == []:
-		result[0] = None
+		# if fail, test for iOS template
+		reqLevel = _parseLevel(gray, gray_template_ios)
+		if reqLevel == []:
+			result[0] = None
+		else:
+			result[0] = reqLevel[0]
 	else:
 		result[0] = reqLevel[0]
 
