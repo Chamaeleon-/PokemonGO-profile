@@ -19,6 +19,9 @@ def getLevel(imagepath, username):
 	# load the example image and convert it to grayscale
 	image = cv2.imread(imagepath)
 	template =  cv2.imread("template_ios.PNG")
+	if image is None:
+		print("Error while reading file")
+		return result
 	gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 	global orig_gray
 	orig_gray = gray
