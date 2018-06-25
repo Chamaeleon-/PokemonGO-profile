@@ -21,7 +21,7 @@ def getLevel(imagepath, username):
 	template =  cv2.imread("template_ios.PNG")
 	if image is None:
 		print("Error while reading file")
-		return result
+		return None
 	gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 	global orig_gray
 	orig_gray = gray
@@ -72,11 +72,12 @@ if __name__ == '__main__':
 	args = vars(ap.parse_args())
 
 	result = getLevel(args["image"],args["username"])
-	print("Level Found: " + str(result[0]))
-	if result[1]:
-		print("Username found: " + args["username"])
-	else:
-		print("No Username found")
+	if result is not None:
+		print("Level Found: " + str(result[0]))
+		if result[1]:
+			print("Username found: " + args["username"])
+		else:
+			print("No Username found")
 
 	# plott images
 	if (args["plot"] == "true"):

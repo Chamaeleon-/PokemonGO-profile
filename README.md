@@ -12,6 +12,8 @@ result = poke_profile.getLevel(fullimagepath, username)
 print(result[0])                          # the found level or None
 print(result[1])                          # booleon; true, if the given username was found
 ```
+```result``` is ```None```, if poke_profile encounterd a file read Error. Check the full image path for typos.
+
 Standalone Usage
 -----
 ```
