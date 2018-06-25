@@ -3,10 +3,10 @@ from PIL import Image
 import pytesseract
 import argparse
 import cv2
-import os
 import numpy as np
 from skimage.feature import match_template
 import matplotlib.pyplot as plt
+from fuzzywuzzy import fuzz
 
 orig_gray = None
 resultImage = None
@@ -34,46 +34,30 @@ def getLevel(imagepath, username):
 
 	# extract level from image
 	height, width  = gray.shape
-	# print("width: " + str(width) +"  "+ str(int(0.1*width)))
 	global levelarea
 	levelarea = gray[y-int(0.1*width):y+int(0.05*width),x-int(0.03*width):x+int(0.12*width)]
 	level = pytesseract.image_to_string(levelarea)
-	print("Found Level:")
 	reqLevel = [int(s) for s in level.split() if s.isdigit()]
 	if reqLevel == []:
-		print("no Level found")
 		result[0] = None
 	else:
-		print(reqLevel[0])
 		result[0] = reqLevel[0]
 
-
-	# check to see if we should apply thresholding to preprocess the
-	# image
+	# apply thresholding to preprocess the image
 	gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-	# grey = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
 
-	# write the grayscale image to disk as a temporary file so we can
-	# apply OCR to it
-	filename = "{}.png".format(os.getpid())
-	cv2.imwrite(filename, gray)
-
-	# load the image as a PIL/Pillow image, apply OCR, and then delete
-	# the temporary file
-	text = pytesseract.image_to_string(Image.open(filename))
-	os.remove(filename)
-	# print(text)
+	# use tesseract to parse image to text
+	text = pytesseract.image_to_string(gray)
 	clearText = ''.join(e for e in text if e.isalnum())
-	if (clearText.find(username) >= 0):
-		print("Username found: " + username)
+	# fuzzy match username to text from image
+	if (fuzz.partial_ratio(username, clearText) >= 80):
+		# at least 80% match
 		result[1] = True
 	else:
-		print("Username not found")
 		result[1] = False
-
 	return result
 
-
+# main if module used standalone
 if __name__ == '__main__':
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", required=True,
@@ -84,7 +68,12 @@ if __name__ == '__main__':
 		help="true, to display plot, false else")
 	args = vars(ap.parse_args())
 
-	getLevel(args["image"],args["username"])
+	result = getLevel(args["image"],args["username"])
+	print("Level Found: " + str(result[0]))
+	if result[1]:
+		print("Username found: " + args["username"])
+	else:
+		print("No Username found")
 
 	# plott images
 	if (args["plot"] == "true"):
