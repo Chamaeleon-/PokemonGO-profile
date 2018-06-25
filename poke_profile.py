@@ -79,8 +79,8 @@ if __name__ == '__main__':
 	if (args["plot"] == "true"):
 		fig = plt.figure(figsize=(8, 3))
 		ax1 = plt.subplot(1, 3, 1)
-		ax2 = plt.subplot(1, 3, 2)
-		ax3 = plt.subplot(1, 3, 3, sharex=ax2, sharey=ax2)
+		ax2 = plt.subplot(1, 3, 3)
+		ax3 = plt.subplot(1, 3, 2, sharex=ax2, sharey=ax2)
 		ax1.imshow(orig_gray)
 		ax2.imshow(levelarea)
 		ax3.imshow(resultImage)
