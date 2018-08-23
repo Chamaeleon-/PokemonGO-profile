@@ -4,7 +4,7 @@ Python script to parse Player Level out of Profile Screenshot and verify the Use
 
 Needs Python3.
 
-Currently optimized for PokemonGO 0.107.1
+Currently optimized for PokemonGO 0.107.1 to 0.111.4
 
 Module Usage
 -----------
